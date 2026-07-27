@@ -5,8 +5,8 @@ resource "aws_vpc" "execute" {
     enable_dns_hostnames = var.vpc_enable_dns_hostnames
 
     tags = {
-        name = "${var.project_name}-vpc"
-        environment = var.vpc_environment
+        Name = "${var.project_name}-vpc"
+        Environment = var.vpc_environment
     }
 }
 resource "aws_subnet" "public1" {
@@ -16,8 +16,8 @@ resource "aws_subnet" "public1" {
 
 
     tags = {
-        name = "${var.project_name}-public-subnet-1"
-        environment = var.vpc_environment
+        Name = "${var.project_name}-public-subnet-1"
+        Environment = var.vpc_environment
     }
 }
 
@@ -27,8 +27,8 @@ resource "aws_subnet" "public2" {
     availability_zone = var.az2
 
     tags = {
-        name = "${var.project_name}-public-subnet-2"
-        environment = var.vpc_environment
+        Name = "${var.project_name}-public-subnet-2"
+        Environment = var.vpc_environment
     }
 }
 
@@ -38,8 +38,8 @@ resource "aws_subnet" "private1" {
     availability_zone = var.az1
 
     tags = {
-        name = "${var.project_name}-private-subnet-1"
-        environment = var.vpc_environment
+        Name = "${var.project_name}-private-subnet-1"
+        Environment = var.vpc_environment
     }
 }
 resource "aws_subnet" "private2" {
@@ -48,13 +48,46 @@ resource "aws_subnet" "private2" {
     availability_zone = var.az2
 
     tags = {
-        name = "${var.project_name}-private-subnet-2"
-        environment = var.vpc_environment
+        Name = "${var.project_name}-private-subnet-2"
+        Environment = var.vpc_environment
     }
 }
 
 # ECR CONFIGURATION
 
-resource "aws_ecr" "execute" {
+resource "aws_ecr_repository" "website" {
+    name = var.website_ecr_repository
+    image_tag_mutability = var.ecr_image_tag_mutability
 
+    image_scanning_configuration {
+      scan_on_push = var.ecr_image_scanning
+    }
+    encryption_configuration {
+      encryption_type = var.ecr_encryption_settings
+    }
+
+    tags = {
+        Name = "${var.project_name}-website_repo"
+        Environment = var.ecr_environment
+    }
 }
+
+resource "aws_ecr_repository" "project" {
+    name = var.project_ecr_repository
+    image_tag_mutability = var.ecr_image_tag_mutability
+
+    image_scanning_configuration {
+      scan_on_push = var.ecr_image_scanning
+    }
+
+    encryption_configuration {
+      encryption_type = var.ecr_encryption_settings
+    }
+
+    tags = {
+        Name = "${var.project_name}-project_repo"
+        Environment = var.ecr_environment
+    }
+}
+
+# ECS CONFIGURATION

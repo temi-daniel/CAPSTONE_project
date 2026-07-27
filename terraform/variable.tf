@@ -77,7 +77,7 @@ variable ecr_repository_type {
 }
 variable ecr_image_tag_mutability {
     type = string
-    default = "MUTABLE"
+    default = "IMMUTABLE"
 }
 variable ecr_encryption_settings {
     type = string
@@ -86,4 +86,8 @@ variable ecr_encryption_settings {
 variable ecr_image_scanning {
     type = bool
     default = true
+}
+variable ecr_environment {
+    type = string
+    default = "dev"
 }
