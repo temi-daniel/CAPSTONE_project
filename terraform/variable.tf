@@ -9,6 +9,10 @@ variable project_name {
 }
 
 # VPC CONFIGURATION
+variable vpc_name {
+    type = string
+    default = "execute-tech-vpc"
+}
 variable vpc_cidr {
     type = string
     default = "10.0.0.0/16"
@@ -56,10 +60,7 @@ variable private_subnet2_cidr {
     type = string
     default = "10.0.4.0/24"
 }
-variable internet_gateway_id {
-    type = string
-    default = "igw"
-}
+
 
 #ECR CONFIGURATION
 
@@ -91,3 +92,99 @@ variable ecr_environment {
     type = string
     default = "dev"
 }
+
+#ECS CONFIGURATION
+
+variable ecs_cluster_name {
+    type = string
+    default = "execute-tech-cluster"
+}
+variable aws_region {
+    type = string
+    default = "eu-north-1"
+}
+
+# TASK DEFINITION
+
+variable task_definition_family {
+    type = string
+    default = "execute-tech-task"
+}
+variable task_cpu {
+    type = string
+    default = "2048"
+}
+variable task_memory {
+    type = string
+    default = "4096"
+}
+variable network_mode {
+    type = string
+    default = "awsvpc"
+}
+variable task_role_arn {
+    type = string
+    default = "ecsTaskExecutionRole"
+}
+variable task_execution_role_arn {
+    type = string 
+    default = "ecsTaskExecutionRole"
+}
+variable requires_compatibilities {
+    type = list(string)
+    default = ["FARGATE"]
+}
+
+# CONTAINER
+variable website_container_name {
+    type = string
+    default = "website-container"
+}
+variable project_container_name {
+    type = string
+    default = "project-app-container"
+}
+variable website_container_image {
+    type = string
+    default = "818005122467.dkr.ecr.eu-north-1.amazonaws.com/execute_tech_website" 
+}
+variable website_container_image {
+    type = string
+    default = "818005122467.dkr.ecr.eu-north-1.amazonaws.com/execute_tech_project"
+}
+variable website_container_port {
+    type = number 
+    default = 80
+}
+variable project_container_port {
+    type = number 
+    default = 80
+}
+
+# ECS SERVICE
+variable ecs_service_name {
+    type = string
+    default = "execute-tech-service"
+}
+variable desired_count {
+    type = number 
+    default = 2
+}
+variable assign_public_ip {
+    type = bool
+    default = false
+}
+# NETWORKING
+
+variable security_group_ecs {
+    type = string
+    default = "execute-tech-sg"
+}
+variable allowed_ssh_cidr_blocks {
+    type = list(string)
+
+    validation {
+        condition = !conditions(var.allowed_ssh_cidr_blocks, 0.0.0.0/0)
+    }
+}
+
