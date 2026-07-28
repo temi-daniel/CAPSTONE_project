@@ -158,6 +158,58 @@ resource "aws_ecr_repository" "project" {
 
 # ECS CONFIGURATION
 
+resource "aws_ecs_cluster" "execute" {
+    cluster = var.ecs_service_name
+
+}
+
+# ECS TASK DEFINITION
+
+resource "aws_task_definition" "website" {
+    task_definition = var.task_definition_family
+    task_cpu = var.task_cpu
+    requires_compatibilities = ["FARGATE"]
+    network_mode = var.network_mode
+    task_memory = var.task_memory
+    task_role_arn = var.task_role_arn
+    execution_role_arn = var.task_execution_role_arn
+
+    container_definitions = jsonencode([
+        {
+            name = var.website_container_name
+            image = var.website_container_image
+
+            portMappings = [
+                {
+                    containerport = var.website_container_port
+                    protocol = "tcp"
+                }
+            ]
+        }
+    ])
+}
+
+# ECS SERVICE
+
+resource "aws_ecs_service" "website" {
+    name = var.ecs_service_name
+    cluster = aws_ecs_cluster.execute.id
+    task_definition = aws_ecs_task_definition.website
+    desired_count = var.desired_count
+    laundh_type = "FARGATE"
+
+    network_configuration = {
+        subnet = aws_subnet.private[1].id
+
+        security_groups = [
+            aws_security_group.execute-sg.id
+        ]
+
+        depends_on = [
+            aws_ecs_cluster.execute
+        ]
+    }
+}
 resource "aws_security_group" "execute-sg" {
     name = var.security_group_ecs
     description = "security_group_for_ecs"
