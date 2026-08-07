@@ -48,17 +48,17 @@ jobs:
         run: docker build --build-arg REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }} -t frontend:${{ github.sha }} ./frontend
 
       - name: Save image as artifact
-        run: docker save frontend:${{ github.sha }} | gzip > frontend_${{ github.sha }}.tar.gz
+        run: docker save frontend:${{ github.sha }} | gzip > frontend${{ github.sha }}.tar.gz
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
           name: docker-image
-          path: frontend_${{ github.sha }}.tar.gz
+          path: frontend${{ github.sha }}.tar.gz
 
   scan:
     name: Security Scan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-lates
     needs: build
 
     steps:
@@ -79,7 +79,7 @@ jobs:
 
       - name: Run Trivy scan
         run: trivy image --exit-code 1 --severity HIGH,CRITICAL --ignore-unfixed frontend:${{ github.sha}}
-  
+
   push:
     name: Push to ECR
     runs-on: ubuntu-latest
@@ -87,30 +87,69 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+
       - uses: actions/download-artifact@v3
         with:
           name: docker-image
+
       - name: Load Docker image
-        run: docker load < frontend_${{ github.sha }}.tar.gz
+        run: docker load < frontend${{ github.sha }}.tar.gz
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           aws-region: ${{ secrets.AWS_REGION }}
-      
-      - name: Log in to Amazon ecr
+
+      - name: Log in to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
 
-        - name: Push Docker image to Amazon ECR
+      - name: Push Docker image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY}}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY }}
+        run: |
+          docker tag frontend:${{ github.sha }} $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ github.sha }}
 
-          run: |
-            docker tag frontend:${{ github.sha }} $ECR_REGISTRY/$ECR_REPOSITORY:${{ gitub.sha}}
-            docker push $ECR_REGISTRY.$ECR_REPOSITORY:${{ github.sha}}
+      - name: Output image URI
+        run: |
+          echo "Image URI: ${{ steps.login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}"
+
+      - name: Download task definition
+        run: |
+          aws ecs describe-task-definition \
+            --task-definition ${{ secrets.ECS_TASK_DEFINITION }} \
+            --query 'taskDefinition' \
+            --output json | \
+          jq 'del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)' \
+            > task-definition.json
+
+      - name: Update task definition with new image
+        id: update-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v2
+        with:
+          task-definition: task-definition.json
+          container-name: ""
+          image: ${{ steps.Login-ecr.outputs.registry }}/${{ secrets.ECR_REPOSITORY }}:${{ github.sha }}
+
+      - name: Register updated task definition
+        id: register-task-def
+        uses: aws-actions/amazon-ecs-register-task-definition@v2
+        with:
+          task-definition: ${{ steps.update-task-def.outputs.task-definition }}
+
+      - name: Update ECS service
+        uses: aws-actions/amazon-ecs-update-service@v2
+        with:
+          cluster: ${{ secrets.ECS_CLUSTER }}
+          service: ${{ secrets.ECS_SERVICE }}
+          task-definition: ${{ steps.register-task-def.outputs.task-definition-arn }}
+
+
+
+
 
 
 
