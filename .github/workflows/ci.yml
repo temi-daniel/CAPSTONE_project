@@ -54,7 +54,6 @@ jobs:
           docker build \
             --build-arg REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }} \
             -t frontend:${{ github.sha }} \
-            ./frontend
             .
 
       - name: Save image as artifact
