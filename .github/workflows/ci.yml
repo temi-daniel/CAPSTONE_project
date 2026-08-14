@@ -105,10 +105,13 @@ jobs:
       - name: Debug GitHub OIDC context
         run: |
           echo "Repository: $GITHUB_REPOSITORY"
+          echo "Repository ID: $GITHUB_REPOSITORY_ID"
+          echo "Organization: $GITHUB_REPOSITORY_OWNER"
           echo "Ref: $GITHUB_REF"
-          echo "Actor: $GITHUB_ACTOR"
+          echo "Repository owner ID: ${{ github.repository_owner_id }}"
+          echo "Repository ID: ${{ github.repository_id }}"
 
-      - name: Configure AWS credentials via OIDC
+          - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
