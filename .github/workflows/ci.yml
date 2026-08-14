@@ -22,9 +22,9 @@ jobs:
     name: Lint
     runs-on: ubuntu-latest
 
-    defaults:
-      run:
-        working-directory: frontend
+    # defaults:
+      #run:
+        # working-directory: frontend
 
     steps:
       - uses: actions/checkout@v4
@@ -55,6 +55,7 @@ jobs:
             --build-arg REACT_APP_API_URL=${{ secrets.REACT_APP_API_URL }} \
             -t frontend:${{ github.sha }} \
             ./frontend
+            .
 
       - name: Save image as artifact
         run: docker save frontend:${{ github.sha }} | gzip > frontend-${{ github.sha }}.tar.gz
