@@ -111,7 +111,7 @@ jobs:
           echo "Repository owner ID: ${{ github.repository_owner_id }}"
           echo "Repository ID: ${{ github.repository_id }}"
 
-          - name: Configure AWS credentials via OIDC
+      - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
