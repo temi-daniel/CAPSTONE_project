@@ -109,6 +109,7 @@ jobs:
           echo "Repository owner: $GITHUB_REPOSITORY_OWNER"
           echo "Repository owner ID: ${{ github.repository_owner_id }}"
           echo "Ref: $GITHUB_REF"
+	  echo "Event: $GITHUB_EVENT_NAME"
 
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
