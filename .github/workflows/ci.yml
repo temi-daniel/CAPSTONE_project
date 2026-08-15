@@ -102,7 +102,13 @@ jobs:
       - name: Load Docker image
         run: docker load < frontend-${{ github.sha }}.tar.gz
 
-
+      - name: Debug GitHub repository information
+        run: |
+          echo "Repository: $GITHUB_REPOSITORY"
+          echo "Repository ID: $GITHUB_REPOSITORY_ID"
+          echo "Repository owner: $GITHUB_REPOSITORY_OWNER"
+          echo "Repository owner ID: ${{ github.repository_owner_id }}"
+          echo "Ref: $GITHUB_REF"
 
       - name: Configure AWS credentials via OIDC
         uses: aws-actions/configure-aws-credentials@v4
