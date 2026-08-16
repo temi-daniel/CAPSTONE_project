@@ -1,0 +1,4 @@
+terraform import 'module.eks.aws_security_group_rule.node["ingress_cluster_9443_webhook"]' sg-087a8bd79f9d3963c_ingress_tcp_9443_9443_sg-0f7342ec1b91611ab
+terraform import 'module.eks.aws_security_group_rule.node["ingress_cluster_443"]' sg-087a8bd79f9d3963c_ingress_tcp_443_443_sg-0f7342ec1b91611ab
+terraform import 'module.eks.aws_security_group_rule.node["ingress_cluster_kubelet"]' sg-087a8bd79f9d3963c_ingress_tcp_10250_10250_sg-0f7342ec1b91611ab
+terraform import 'module.eks.aws_security_group_rule.node["ingress_cluster_4443_webhook"]' sg-087a8bd79f9d3963c_ingress_tcp_4443_4443_sg-0f7342ec1b91611ab

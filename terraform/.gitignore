@@ -1,0 +1,26 @@
+# Node
+node_modules/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+terraform/.terraform/
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+terraform/empty.tfstate
+
+# Terraform crash logs
+crash.log
+crash.*.log
+
+# Terraform plans
+*.tfplan
+*.plan
